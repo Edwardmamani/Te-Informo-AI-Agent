@@ -1,0 +1,154 @@
+###
+# Archivo de pruebas REST Client para el servidor de agente IA
+# Usa la extensión REST Client de VS Code para ejecutar estas peticiones
+# Base URL: http://localhost:5000
+###
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### ============================================
+# 1. HEALTH CHECK
+# Verificar que el servidor está funcionando
+### ============================================
+
+GET {{baseUrl}}/agent/health
+
+### ============================================
+# 2. AGENT QUERY - Consulta básica
+# Probar el endpoint principal de consultas
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "query": "¿Qué es la inteligencia artificial?"
+}
+
+### ============================================
+# 3. AGENT QUERY - Consulta sobre noticias
+# Probar con una consulta sobre noticias actuales
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "query": "Explícame las últimas tendencias en tecnología para 2024"
+}
+
+### ============================================
+# 4. AGENT QUERY - Consulta específica
+# Probar con una consulta más específica
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "query": "¿Cuáles son los beneficios de usar CrewAI para desarrollar agentes?"
+}
+
+### ============================================
+# 5. AGENT QUERY - Error: query vacío
+# Probar validación de campo requerido
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "query": ""
+}
+
+### ============================================
+# 6. AGENT QUERY - Error: sin campo query
+# Probar validación cuando falta el campo
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "otro_campo": "valor"
+}
+
+### ============================================
+# 7. AGENT SUGGESTIONS - Sugerencias básicas
+# Obtener sugerencias sobre un tema
+### ============================================
+
+POST {{baseUrl}}/agent/suggestions
+Content-Type: {{contentType}}
+
+{
+  "query": "inteligencia artificial"
+}
+
+### ============================================
+# 8. AGENT SUGGESTIONS - Con contexto
+# Obtener sugerencias con contexto previo
+### ============================================
+
+POST {{baseUrl}}/agent/suggestions
+Content-Type: {{contentType}}
+
+{
+  "query": "machine learning",
+  "context": [
+    "El usuario ya ha preguntado sobre deep learning",
+    "Está interesado en aplicaciones prácticas",
+    "Tiene conocimientos básicos de programación"
+  ]
+}
+
+### ============================================
+# 9. AGENT SUGGESTIONS - Tema específico
+# Probar con un tema más específico
+### ============================================
+
+POST {{baseUrl}}/agent/suggestions
+Content-Type: {{contentType}}
+
+{
+  "query": "agentes de IA con CrewAI"
+}
+
+### ============================================
+# 10. AGENT SUGGESTIONS - Error: query vacío
+# Probar validación de campo requerido
+### ============================================
+
+POST {{baseUrl}}/agent/suggestions
+Content-Type: {{contentType}}
+
+{
+  "query": "",
+  "context": []
+}
+
+### ============================================
+# 11. AGENT SUGGESTIONS - Sin contexto
+# Probar sin campo context (debe funcionar)
+### ============================================
+
+POST {{baseUrl}}/agent/suggestions
+Content-Type: {{contentType}}
+
+{
+  "query": "desarrollo web"
+}
+
+### ============================================
+# 12. AGENT QUERY - Consulta compleja
+# Probar con una consulta más compleja
+### ============================================
+
+POST {{baseUrl}}/agent/query
+Content-Type: {{contentType}}
+
+{
+  "query": "Compara las ventajas y desventajas de usar agentes de IA multi-agente versus sistemas de un solo agente"
+}
+
