@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import searchRoutes from './routes/search.routes';
+import newsRoutes from './routes/news.routes';
 
 // Cargar variables de entorno desde la raíz del proyecto
 dotenv.config({ path: path.join(__dirname, '../../.env') });
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api', searchRoutes);
+app.use('/api/news', newsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

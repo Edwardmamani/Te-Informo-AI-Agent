@@ -1,0 +1,224 @@
+###
+# Archivo de pruebas REST Client para las rutas de noticias
+# Usa la extensión REST Client de VS Code para ejecutar estas peticiones
+# Base URL: http://localhost:3001
+###
+
+@baseUrl = http://localhost:3001
+@contentType = application/json
+
+### ============================================
+# 1. HEALTH CHECK
+# Verificar que el servicio de noticias está funcionando
+### ============================================
+
+GET {{baseUrl}}/api/news/health
+
+### ============================================
+# 2. SEARCH NEWS - Búsqueda básica
+# Buscar noticias sobre un tema específico
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": "inteligencia artificial"
+}
+
+### ============================================
+# 3. SEARCH NEWS - Con intereses del usuario
+# Buscar noticias filtradas por intereses del usuario
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": "tecnología",
+  "userInterests": ["IA", "machine learning", "tecnología"]
+}
+
+### ============================================
+# 4. SEARCH NEWS - Con múltiples intereses
+# Probar con varios intereses del usuario
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": "noticias de ciencia",
+  "userInterests": ["ciencia", "investigación", "descubrimientos"]
+}
+
+### ============================================
+# 5. SEARCH NEWS - Error: query vacío
+# Probar validación de campo requerido (query vacío)
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": ""
+}
+
+### ============================================
+# 6. SEARCH NEWS - Error: sin campo query
+# Probar validación cuando falta el campo query
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "userInterests": ["tecnología"]
+}
+
+### ============================================
+# 7. SEARCH NEWS - Error: userInterests no es array
+# Probar validación cuando userInterests no es un array
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": "tecnología",
+  "userInterests": "no es un array"
+}
+
+### ============================================
+# 8. AGGREGATE NEWS - Agregación básica
+# Obtener noticias agregadas de múltiples fuentes
+### ============================================
+
+POST {{baseUrl}}/api/news/aggregate
+Content-Type: {{contentType}}
+
+{
+  "query": "inteligencia artificial"
+}
+
+### ============================================
+# 9. AGGREGATE NEWS - Tema específico
+# Probar agregación con un tema más específico
+### ============================================
+
+POST {{baseUrl}}/api/news/aggregate
+Content-Type: {{contentType}}
+
+{
+  "query": "cambio climático"
+}
+
+### ============================================
+# 10. AGGREGATE NEWS - Error: query vacío
+# Probar validación de campo requerido
+### ============================================
+
+POST {{baseUrl}}/api/news/aggregate
+Content-Type: {{contentType}}
+
+{
+  "query": ""
+}
+
+### ============================================
+# 11. AGGREGATE NEWS - Error: sin campo query
+# Probar validación cuando falta el campo query
+### ============================================
+
+POST {{baseUrl}}/api/news/aggregate
+Content-Type: {{contentType}}
+
+{
+  "otro_campo": "valor"
+}
+
+### ============================================
+# 12. EXTRACT CONTENT - Extracción básica
+# Extraer contenido completo de un artículo
+### ============================================
+
+POST {{baseUrl}}/api/news/extract
+Content-Type: {{contentType}}
+
+{
+  "url": "https://www.bbc.com/news/technology"
+}
+
+### ============================================
+# 13. EXTRACT CONTENT - Artículo de El País
+# Extraer contenido de un artículo específico
+### ============================================
+
+POST {{baseUrl}}/api/news/extract
+Content-Type: {{contentType}}
+
+{
+  "url": "https://elpais.com/tecnologia/"
+}
+
+### ============================================
+# 14. EXTRACT CONTENT - Error: URL vacía
+# Probar validación cuando la URL está vacía
+### ============================================
+
+POST {{baseUrl}}/api/news/extract
+Content-Type: {{contentType}}
+
+{
+  "url": ""
+}
+
+### ============================================
+# 15. EXTRACT CONTENT - Error: sin campo url
+# Probar validación cuando falta el campo url
+### ============================================
+
+POST {{baseUrl}}/api/news/extract
+Content-Type: {{contentType}}
+
+{
+  "otro_campo": "valor"
+}
+
+### ============================================
+# 16. EXTRACT CONTENT - Error: URL inválida
+# Probar validación cuando la URL no es válida
+### ============================================
+
+POST {{baseUrl}}/api/news/extract
+Content-Type: {{contentType}}
+
+{
+  "url": "no-es-una-url-valida"
+}
+
+### ============================================
+# 17. SEARCH NEWS - Búsqueda en español
+# Probar búsqueda con términos en español
+### ============================================
+
+POST {{baseUrl}}/api/news/search
+Content-Type: {{contentType}}
+
+{
+  "query": "noticias de tecnología en España",
+  "userInterests": ["tecnología", "España"]
+}
+
+### ============================================
+# 18. AGGREGATE NEWS - Tema de actualidad
+# Probar con un tema de actualidad
+### ============================================
+
+POST {{baseUrl}}/api/news/aggregate
+Content-Type: {{contentType}}
+
+{
+  "query": "avances en medicina"
+}
+
