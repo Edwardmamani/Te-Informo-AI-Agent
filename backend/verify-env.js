@@ -18,3 +18,4 @@ console.log('Todas las variables de entorno cargadas:');
 console.log('PORT:', process.env.PORT);
 console.log('MAX_RESULTS:', process.env.MAX_RESULTS);
 console.log('TIMEOUT_MS:', process.env.TIMEOUT_MS);
+
