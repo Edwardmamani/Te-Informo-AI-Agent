@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: te-informo-backend
+    ports:
+      - "9374:9374"
+    volumes:
+      # Montar código fuente para hot-reload
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./backend/nodemon.json:/app/nodemon.json
+      # Excluir node_modules del volumen (usar los del contenedor)
+      - /app/node_modules
+      - /app/dist
+    environment:
+      - NODE_ENV=development
+      - PORT=9374
+      # Habilitar polling para detectar cambios en archivos
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      # Variables de entorno (ajustar según necesidad)
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - te-informo-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: te-informo-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Montar código fuente para hot-reload
+      - ./frontend:/app
+      # Excluir node_modules del volumen
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # Habilitar polling para detectar cambios en archivos
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - ELECTRON_DISABLE_SECURITY_WARNINGS=true
+    restart: unless-stopped
+    networks:
+      - te-informo-network
+    # Depende del backend
+    depends_on:
+      - backend
+
+networks:
+  te-informo-network:
+    driver: bridge
+
