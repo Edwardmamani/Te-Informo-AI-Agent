@@ -3,7 +3,7 @@
  */
 
 // Configuración
-const API_URL = 'http://localhost:9374/api';
+const API_URL = 'http://localhost:3001/api';
 
 // Estado
 let conversationContext = [];

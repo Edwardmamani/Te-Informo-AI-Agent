@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Exponer puerto
-EXPOSE 9374
+EXPOSE 3001
 
 # Comando para desarrollo con nodemon y polling
 CMD ["npm", "run", "dev"]

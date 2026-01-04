@@ -8,7 +8,7 @@ import searchRoutes from './routes/search.routes';
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const app: Application = express();
-const PORT = process.env.PORT || 9374;
+const PORT = process.env.PORT || 3001;
 
 // Middlewares
 app.use(cors());

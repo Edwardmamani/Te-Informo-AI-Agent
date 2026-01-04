@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: te-informo-backend
     ports:
-      - "9374:9374"
+      - "3001:3001"
     volumes:
       # Montar código fuente para hot-reload
       - ./backend/src:/app/src
@@ -19,7 +19,7 @@ services:
       - /app/dist
     environment:
       - NODE_ENV=development
-      - PORT=9374
+      - PORT=3001
       # Habilitar polling para detectar cambios en archivos
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
