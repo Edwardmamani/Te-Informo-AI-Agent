@@ -35,6 +35,7 @@ if __name__ == '__main__':
     print(f"   - GET  /agent/health")
     print(f"   - POST /agent/query")
     print(f"   - POST /agent/suggestions")
+    print(f"   - POST /agent/generate-news")
     
     app.run(
         host=SERVER_CONFIG['host'],

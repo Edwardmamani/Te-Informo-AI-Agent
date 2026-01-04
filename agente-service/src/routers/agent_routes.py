@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from src.controllers.agent_controller import handle_query, handle_suggestions
+from src.controllers.news_controller import handle_news_generation
 
 # Crear un blueprint para las rutas del agente
 agent_bp = Blueprint('agent', __name__, url_prefix='/agent')
@@ -39,5 +40,28 @@ def suggestions():
         context = []
     
     response, status_code = handle_suggestions(query_text, context)
+    return jsonify(response), status_code
+
+@agent_bp.route('/generate-news', methods=['POST'])
+def generate_news():
+    """
+    Endpoint para generar noticias usando el flujo completo de agentes
+    Body esperado: {
+        "solicitud": "tema de la noticia a generar",
+        "max_iterations": 3 (opcional),
+        "quality_threshold": 0.8 (opcional)
+    }
+    """
+    data = request.get_json()
+    if data:
+        solicitud = data.get('solicitud', '')
+        max_iterations = data.get('max_iterations', 3)
+        quality_threshold = data.get('quality_threshold', 0.8)
+    else:
+        solicitud = ''
+        max_iterations = 3
+        quality_threshold = 0.8
+    
+    response, status_code = handle_news_generation(solicitud, max_iterations, quality_threshold)
     return jsonify(response), status_code
 
