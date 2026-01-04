@@ -1,0 +1,48 @@
+{
+  "name": "te-informo-backend",
+  "version": "1.0.0",
+  "description": "Backend API para Te Informo AI Agent",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "nodemon",
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch"
+  },
+  "keywords": [
+    "ai",
+    "mcts",
+    "search",
+    "api",
+    "backend"
+  ],
+  "author": "Team Te-Informo",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^1.25.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "puppeteer": "^24.25.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/http-cache-semantics": "^4.0.4",
+    "@types/ms": "^2.1.0",
+    "@types/node": "^20.9.0",
+    "@types/qs": "^6.14.0",
+    "@types/range-parser": "^1.2.7",
+    "@types/send": "^1.2.0",
+    "@types/serve-static": "^1.15.9",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2"
+  }
+}
+

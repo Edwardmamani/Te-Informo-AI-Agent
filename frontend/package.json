@@ -1,0 +1,39 @@
+{
+  "name": "te-informo-frontend",
+  "version": "1.0.0",
+  "description": "Frontend Electron para Te Informo AI Agent",
+  "main": "main.js",
+  "scripts": {
+    "start": "start index.html",
+    "dev": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win"
+  },
+  "keywords": [
+    "electron",
+    "frontend",
+    "desktop",
+    "app"
+  ],
+  "author": "Team Te-Informo",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.teinformo.app",
+    "productName": "Te Informo",
+    "directories": {
+      "output": "../dist-electron"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  }
+}
+
