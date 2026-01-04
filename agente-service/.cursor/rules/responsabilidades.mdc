@@ -1,0 +1,138 @@
+# Reglas Generales de Arquitectura - Responsabilidades de Carpetas
+
+Estas reglas definen las responsabilidades y restricciones para cada carpeta en `agente-service/src`. Seguir estas reglas asegura mantener la separación de responsabilidades y la arquitectura del proyecto.
+
+## Reglas por Carpeta
+
+### 📁 `agents/`
+- **SOLO** debe contener definiciones de agentes de IA usando CrewAI
+- **DEBE** usar funciones factory (ej: `create_*_agent()`) para crear instancias
+- **DEBE** definir roles, objetivos y backstories para cada agente
+- **DEBE** obtener el LLM desde `src.config.settings.get_llm()`
+- **NO DEBE** contener lógica de negocio o procesamiento de requests
+- **NO DEBE** llamar directamente a crews o tareas
+
+### 📁 `tasks/`
+- **SOLO** debe contener definiciones de `Task` de CrewAI
+- **DEBE** usar funciones factory (ej: `create_*_task()`) para crear instancias
+- **DEBE** asignar agentes específicos a cada tarea
+- **DEBE** definir descripciones detalladas y outputs esperados
+- **PUEDE** importar agentes desde `src.agents` para asignarlos
+- **NO DEBE** ejecutar tareas directamente ni contener lógica de procesamiento
+
+### 📁 `crews/`
+- **SOLO** debe contener definiciones de `Crew` de CrewAI
+- **DEBE** usar funciones factory (ej: `create_*_crew()`) para crear instancias
+- **DEBE** combinar agentes y tareas para crear workflows
+- **PUEDE** importar agentes desde `src.agents` y tareas desde `src.tasks`
+- **NO DEBE** ejecutar crews directamente (eso es responsabilidad de controllers)
+- **NO DEBE** contener lógica de validación o manejo de errores
+
+### 📁 `controllers/`
+- **DEBE** contener toda la lógica de negocio y procesamiento de solicitudes
+- **DEBE** validar datos de entrada antes de procesar
+- **DEBE** invocar crews desde `src.crews` para ejecutar workflows
+- **DEBE** manejar errores y excepciones
+- **DEBE** retornar tuplas `(respuesta_dict, código_estado_HTTP)`
+- **PUEDE** formatear y transformar datos antes de retornar
+- **NO DEBE** definir rutas HTTP (eso es responsabilidad de routers)
+- **NO DEBE** crear directamente agentes, tareas o crews (debe usar funciones factory)
+
+### 📁 `routers/`
+- **SOLO** debe contener definiciones de rutas HTTP/API
+- **DEBE** usar blueprints de Flask para agrupar rutas relacionadas
+- **DEBE** extraer datos del request (JSON body, query params, etc.)
+- **DEBE** llamar a funciones de controllers para procesar solicitudes
+- **DEBE** retornar respuestas JSON al cliente
+- **NO DEBE** contener lógica de negocio (debe delegar a controllers)
+- **NO DEBE** ejecutar crews, agentes o tareas directamente
+
+### 📁 `config/`
+- **SOLO** debe contener configuraciones del sistema
+- **DEBE** centralizar todas las configuraciones (LLM, servidor, etc.)
+- **DEBE** proporcionar funciones para obtener instancias configuradas
+- **DEBE** usar variables de entorno cuando sea apropiado
+- **PUEDE** importar utilidades desde `src.utils` para cargar configuraciones
+- **NO DEBE** contener lógica de negocio o procesamiento
+- **NO DEBE** ejecutar crews, agentes o tareas
+
+### 📁 `utils/`
+- **SOLO** debe contener funciones utilitarias compartidas
+- **DEBE** ser independiente de otras capas (sin dependencias circulares)
+- **PUEDE** contener helpers para carga de variables de entorno
+- **PUEDE** proporcionar funciones para acceso a API keys
+- **NO DEBE** contener lógica de negocio específica
+- **NO DEBE** depender de agents, tasks, crews o controllers
+
+### 📁 `services/`
+- **DEBE** contener servicios de lógica de negocio compleja cuando sea necesario
+- **PUEDE** proporcionar abstracciones sobre APIs externas
+- **PUEDE** manejar operaciones que requieren múltiples pasos
+- **PUEDE** ser importado por controllers cuando se necesite lógica reutilizable
+- **NO DEBE** definir rutas HTTP ni agentes directamente
+- **NO DEBE** ejecutar crews directamente (debe ser invocado por controllers)
+
+### 📁 `test/`
+- **DEBE** contener todos los archivos de prueba
+- **PUEDE** incluir tests unitarios, de integración y pruebas manuales
+- **PUEDE** contener ejemplos de uso de la API
+- **NO DEBE** contener código de producción
+
+## Reglas de Flujo de Datos
+
+### Flujo Correcto de Dependencias
+```
+Cliente → routers/ → controllers/ → crews/ → agents/ + tasks/
+                                                ↓
+                                           config/ + utils/
+```
+
+### Reglas de Importación
+- `routers/` puede importar desde: `controllers/`
+- `controllers/` puede importar desde: `crews/`, `config/`, `utils/`, `services/`
+- `crews/` puede importar desde: `agents/`, `tasks/`, `config/`, `utils/`
+- `agents/` puede importar desde: `config/`, `utils/`
+- `tasks/` puede importar desde: `agents/`, `config/`, `utils/`
+- `config/` puede importar desde: `utils/`
+- `utils/` NO debe importar desde otras capas (excepto librerías externas)
+- `services/` puede importar desde: `config/`, `utils/`
+
+### Reglas de Ejecución
+- **NO** ejecutar crews directamente desde routers
+- **NO** ejecutar crews directamente desde agents o tasks
+- **NO** crear agentes o tasks directamente desde controllers (usar factory functions)
+- **SÍ** ejecutar crews desde controllers
+- **SÍ** usar factory functions para crear instancias
+
+## Patrones de Diseño Requeridos
+
+### Factory Pattern
+- **AGENTES**: Usar funciones `create_*_agent()` en `agents/`
+- **TAREAS**: Usar funciones `create_*_task()` en `tasks/`
+- **CREWS**: Usar funciones `create_*_crew()` en `crews/`
+
+### Separación de Responsabilidades
+- Cada carpeta tiene un propósito único y claro
+- No mezclar responsabilidades entre carpetas
+- Mantener dependencias unidireccionales
+
+### Manejo de Errores
+- Los controllers deben manejar errores y retornar códigos HTTP apropiados
+- Los routers deben retornar respuestas JSON formateadas
+- Los crews, agents y tasks NO deben manejar errores HTTP
+
+## Convenciones de Nomenclatura
+
+- **Agentes**: `create_{nombre}_agent()` (ej: `create_investigador_agent()`)
+- **Tareas**: `create_{nombre}_task()` (ej: `create_query_task()`)
+- **Crews**: `create_{nombre}_crew()` (ej: `create_query_crew()`)
+- **Controllers**: `handle_{acción}()` (ej: `handle_query()`)
+- **Rutas**: Usar nombres descriptivos en snake_case para funciones de endpoint
+
+## Notas Importantes
+
+- Mantener la arquitectura limpia y modular
+- Seguir el flujo de datos establecido
+- Usar factory functions para todas las instancias
+- No crear dependencias circulares
+- Mantener las responsabilidades claramente separadas
