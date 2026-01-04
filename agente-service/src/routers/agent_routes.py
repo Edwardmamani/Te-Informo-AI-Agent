@@ -52,14 +52,21 @@ def generate_news():
         "quality_threshold": 0.8 (opcional)
     }
     """
-    data = request.get_json()
-    if data:
-        solicitud = data.get('solicitud', '')
-        max_iterations = data.get('max_iterations', 3)
-        quality_threshold = data.get('quality_threshold', 0.8)
-    else:
-        solicitud = ''
+    data = request.get_json() or {}
+    solicitud = data.get('solicitud')
+    max_iterations = data.get('max_iterations')
+    quality_threshold = data.get('quality_threshold')
+
+    if solicitud is None or str(solicitud).strip() == "":
+        return jsonify({
+            "error": "No se proporcionó solicitud para generación de noticia.",
+            "detail": "El campo 'solicitud' es obligatorio y no debe estar vacío."
+        }), 400
+
+    # Valores por defecto si no fueron provistos
+    if max_iterations is None:
         max_iterations = 3
+    if quality_threshold is None:
         quality_threshold = 0.8
     
     response, status_code = handle_news_generation(solicitud, max_iterations, quality_threshold)

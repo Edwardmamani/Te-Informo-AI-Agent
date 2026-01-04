@@ -248,7 +248,7 @@ def extract_content_tool(url: str) -> str:
 
 # Crear herramientas para CrewAI usando @tool decorator
 try:
-    from crewai_tools import tool
+    from crewai.tools import tool
     
     @tool("Buscar Noticias")
     def search_news(query: str, user_interests: str = "") -> str:
@@ -281,8 +281,8 @@ try:
         return extract_content_tool(url)
         
 except ImportError:
-    # Si crewai_tools no está disponible, usar funciones simples
-    print("⚠️ crewai_tools no está disponible. Usando funciones simples.")
+    # Si crewai.tools no está disponible, usar funciones simples
+    print("⚠️ crewai.tools no está disponible. Usando funciones simples.")
     search_news = search_news_tool
     extract_article = extract_content_tool
 
