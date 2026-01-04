@@ -28,21 +28,23 @@ export class GeminiService {
         `${idx + 1}. ${article.title}\n   ${article.snippet}\n   Fuente: ${article.source}`
       ).join('\n\n');
 
-      const prompt = `Eres un asistente de noticias inteligente. Analiza las siguientes noticias sobre "${userQuery}" y proporciona:
+      const prompt = `
+      Eres un asistente de noticias inteligente.
+      Analiza las siguientes noticias sobre"${userQuery}" y proporciona:
 
-1. Un resumen conciso y claro (2-3 párrafos)
-2. Los 5 puntos clave más importantes
-3. 3 temas relacionados que podrían interesar al usuario
+      1. Un resumen conciso y claro (2-3 párrafos)
+      2. Los 5 puntos clave más importantes
+      3. 3 temas relacionados que podrían interesar al usuario
 
-NOTICIAS:
-${newsContext}
+      NOTICIAS:
+      ${newsContext}
 
-Responde en formato JSON:
-{
-  "summary": "resumen aquí",
-  "keyPoints": ["punto 1", "punto 2", ...],
-  "recommendations": ["tema 1", "tema 2", "tema 3"]
-}`;
+      Responde en formato JSON:
+      {
+        "summary": "resumen aquí",
+        "keyPoints": ["punto 1", "punto 2", ...],
+        "recommendations": ["tema 1", "tema 2", "tema 3"]
+      }`;
 
       const response = await axios.post(
         `${this.apiUrl}?key=${this.apiKey}`,

@@ -1,3 +1,5 @@
+// OJO: poco uso, se puede borrar
+
 import puppeteer, { Browser, Page } from 'puppeteer';
 import * as fs from 'fs';
 import * as path from 'path';

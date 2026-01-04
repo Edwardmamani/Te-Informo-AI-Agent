@@ -28,30 +28,31 @@ services:
     networks:
       - te-informo-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: te-informo-frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      # Montar código fuente para hot-reload
-      - ./frontend:/app
-      # Excluir node_modules del volumen
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      # Habilitar polling para detectar cambios en archivos
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-      - ELECTRON_DISABLE_SECURITY_WARNINGS=true
-    restart: unless-stopped
-    networks:
-      - te-informo-network
-    # Depende del backend
-    depends_on:
-      - backend
+  # NOTA: El frontend Electron NO se ejecuta en Docker
+  # Electron requiere acceso a la GUI del sistema y no funciona bien en contenedores
+  # Para desarrollo, ejecuta Electron localmente con: cd frontend && npm run dev
+  # El frontend se conectará al backend en Docker a través de http://localhost:3001
+  #
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: te-informo-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
+  #     - CHOKIDAR_USEPOLLING=true
+  #     - WATCHPACK_POLLING=true
+  #     - ELECTRON_DISABLE_SECURITY_WARNINGS=true
+  #   restart: unless-stopped
+  #   networks:
+  #     - te-informo-network
+  #   depends_on:
+  #     - backend
 
 networks:
   te-informo-network:

@@ -152,25 +152,36 @@ Para validar nuestra solución, nos enfocamos en estos resultados medibles:
 
 ### 🚀 Ejecución
 
-**Opción 1: Ejecutar todo (Backend + Frontend)**
+**⚠️ NOTA:** Electron no funciona en Docker. Usa una de estas opciones:
+
+**Opción 1: Backend en Docker + Frontend Local (Recomendado para desarrollo)**
 ```bash
-npm run start
+# Terminal 1: Iniciar backend en Docker
+docker-compose up backend
+
+# Terminal 2: Ejecutar Electron localmente
+cd frontend
+npm install  # Solo la primera vez
+npm run dev
 ```
 
-**Opción 2: Solo backend (modo desarrollo)**
+**Opción 2: Todo Local (sin Docker)**
 ```bash
-npm run dev:backend
-```
+# Terminal 1: Backend
+cd backend
+npm install  # Solo la primera vez
+npm run dev
 
-**Opción 3: Solo frontend**
-```bash
-npm run start:frontend
+# Terminal 2: Frontend Electron
+cd frontend
+npm install  # Solo la primera vez
+npm run dev
 ```
 
 ### 🌐 Acceso
-- **Frontend:** Se abrirá automáticamente en tu navegador
-- **Backend API:** `http://localhost:9374`
-- **Health Check:** `http://localhost:9374/health`
+- **Frontend Electron:** Se abrirá automáticamente como aplicación de escritorio
+- **Backend API:** `http://localhost:3001/api`
+- **Health Check:** `http://localhost:3001/health` (si está configurado)
 
 ---
 
@@ -221,19 +232,24 @@ Te-Informo-AI-Agent/
 │   │   ├── models/        # Modelos de datos
 │   │   └── routes/        # Definición de rutas
 │   └── dist/              # Código compilado
-├── frontend/              # Interfaz web
+├── frontend/              # Interfaz Electron
 │   ├── index.html         # Página principal
+│   ├── main.js           # Proceso principal de Electron
 │   ├── css/               # Estilos
 │   └── js/                # JavaScript del cliente
 └── .env                   # Variables de entorno
 ```
 
 ### 🛠️ Scripts disponibles
-- `npm run start` - Ejecuta backend + frontend
-- `npm run dev:backend` - Backend en modo desarrollo (hot reload)
-- `npm run build:backend` - Compila TypeScript a JavaScript
-- `npm run start:frontend` - Solo frontend
-- `npm run dev:electron` - Ejecutar como aplicación de escritorio
+
+**Backend:**
+- `cd backend && npm run dev` - Backend en modo desarrollo (hot reload)
+- `cd backend && npm run build` - Compila TypeScript a JavaScript
+
+**Frontend:**
+- `cd frontend && npm run dev` - Ejecutar Electron en desarrollo
+- `cd frontend && npm run build` - Construir aplicación para producción
+- `cd frontend && npm run build:win` - Construir instalador para Windows
 
 ### 🐛 Solución de problemas
 

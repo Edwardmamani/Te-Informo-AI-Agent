@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+// OJO: poco uso
 import screenshotService from './screenshot.service';
 
 export interface NewsArticle {
