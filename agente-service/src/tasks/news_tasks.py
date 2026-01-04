@@ -188,19 +188,51 @@ def create_writing_task(hechos_validados: str, solicitud_noticia: str):
         1. Estructura el artículo con formato periodístico profesional
         2. Presenta la información de manera clara, objetiva y equilibrada
         3. Usa un estilo periodístico estándar (quién, qué, cuándo, dónde, por qué, cómo)
-        4. Formatea la salida con:
-           - Título llamativo pero preciso
-           - Entradilla/introducción atractiva
-           - Cuerpo del artículo bien estructurado
-           - Conclusión apropiada
-        5. Asegúrate de que el artículo sea libre de opiniones personales
-        6. Cita las fuentes de manera apropiada
-        7. Mantén un tono profesional y objetivo
+        4. Asegúrate de que el artículo sea libre de opiniones personales
+        5. Cita las fuentes de manera apropiada
+        6. Mantén un tono profesional y objetivo
+        
+        FORMATO DE SALIDA REQUERIDO - HTML:
+        Debes retornar ÚNICAMENTE el contenido en formato HTML, envuelto en un tag <article>.
+        La estructura debe ser exactamente así:
+        
+        <article>
+            <header>
+                <h1>Título llamativo pero preciso del artículo</h1>
+                <p class="entradilla">Entradilla o introducción atractiva que resuma los puntos clave</p>
+            </header>
+            
+            <section class="cuerpo">
+                <p>Primer párrafo del cuerpo del artículo...</p>
+                <p>Segundo párrafo con información relevante...</p>
+                <p>Continúa desarrollando el contenido de manera estructurada...</p>
+                <!-- Agrega más párrafos según sea necesario -->
+            </section>
+            
+            <footer>
+                <p class="conclusion">Conclusión apropiada que cierre el artículo</p>
+                <div class="fuentes">
+                    <h3>Fuentes:</h3>
+                    <ul>
+                        <li>Fuente 1</li>
+                        <li>Fuente 2</li>
+                        <!-- Lista todas las fuentes utilizadas -->
+                    </ul>
+                </div>
+            </footer>
+        </article>
+        
+        IMPORTANTE:
+        - Retorna SOLO el HTML, sin texto adicional antes o después
+        - El tag <article> debe ser el elemento raíz
+        - Usa etiquetas HTML semánticas apropiadas (header, section, footer, h1, p, ul, li)
+        - El HTML debe ser válido y bien formateado
+        - No incluyas explicaciones, comentarios fuera del HTML, o texto adicional
         
         El artículo debe estar listo para revisión final del Jefe de Redacción.
         """,
         agent=writer,
-        expected_output="Un artículo de noticia completo, bien formateado y listo para revisión final"
+        expected_output="Un artículo de noticia completo en formato HTML, envuelto en un tag <article>, bien estructurado con header, cuerpo y footer, y listo para revisión final"
     )
 
 def create_final_review_task(articulo: str, solicitud_noticia: str, plan_context: str = ""):
