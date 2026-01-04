@@ -5,3 +5,4 @@
 window.addEventListener('DOMContentLoaded', () => {
   console.log('Te Informo - Electron App Loaded');
 });
+

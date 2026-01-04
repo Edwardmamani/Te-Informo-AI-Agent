@@ -15,11 +15,11 @@ function createWindow() {
     backgroundColor: '#1a1a2e',
     frame: true,
     titleBarStyle: 'default',
-    icon: path.join(__dirname, 'frontend/assets/icon.png')
+    icon: path.join(__dirname, 'assets/icon.png')
   });
 
   // Cargar la aplicación web
-  win.loadFile('frontend/index.html');
+  win.loadFile('index.html');
 
   // Abrir DevTools en desarrollo
   if (process.env.NODE_ENV === 'development') {
@@ -42,3 +42,4 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
