@@ -14,44 +14,6 @@ from src.agents.watchdog_agent import create_watchdog_agent
 from src.agents.critic_agent import create_critic_agent
 from src.agents.writer_agent import create_writer_agent
 
-def create_query_crew(query: str):
-    """
-    Crea un crew para responder una consulta
-    
-    Args:
-        query: La consulta del usuario
-        
-    Returns:
-        Crew: Un crew configurado con el agente y la tarea
-    """
-    investigador = create_investigador_agent()
-    task = create_query_task(query)
-    
-    return Crew(
-        agents=[investigador],
-        tasks=[task],
-        verbose=True
-    )
-
-def create_suggestions_crew(query: str, context: list = None):
-    """
-    Crea un crew para generar sugerencias
-    
-    Args:
-        query: El tema principal de interés
-        context: Lista de contexto previo de la conversación
-        
-    Returns:
-        Crew: Un crew configurado para generar sugerencias
-    """
-    investigador = create_investigador_agent()
-    task = create_suggestions_task(query, context)
-    
-    return Crew(
-        agents=[investigador],
-        tasks=[task],
-        verbose=True
-    )
 
 def create_news_generation_crew(solicitud_noticia: str):
     """

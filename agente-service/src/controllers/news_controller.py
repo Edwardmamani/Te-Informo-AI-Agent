@@ -121,9 +121,9 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         critic = create_critic_agent()
         iteration = 0
         informe_actual = informe_preliminar
-        code_detected = None
+        code_detected = 'CODE01'
         
-        while (code_detected != 'CODE02') and (iteration < max_iterations):
+        while (code_detected == 'CODE01') and (iteration < max_iterations):
             iteration += 1
             print(f"🔄 Iteración {iteration}/{max_iterations} - Analizando calidad...")
             
@@ -139,6 +139,9 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
             # Detectar CODE01 o CODE02
             code, found = detect_code01_code02(critique_text)
             code_detected = code
+            print("*"*30)
+            print(code_detected)
+            print("*"*30)
             print(f"📊 Código detectado: {code}")
             
             if code == 'CODE01':
