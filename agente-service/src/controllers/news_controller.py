@@ -14,6 +14,7 @@ from src.agents.watchdog_agent import create_watchdog_agent
 from src.agents.critic_agent import create_critic_agent
 from src.agents.writer_agent import create_writer_agent
 from src.tools.news_api_tool import NewsAPITool
+interador = 1
 
 def format_articles_as_text(articles: list) -> str:
     """
@@ -54,7 +55,9 @@ def detect_code01_code02(text: str):
     Returns:
         tuple: (code, bool) - Siempre ('CODE02', True)
     """
-    return 'CODE02', True
+    global interador
+    interador += 1
+    return f'CODE0{interador%2+1}', True
 
 def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, quality_threshold: float = 0.8):
     """
@@ -200,7 +203,7 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         # Paso 4: Writer - Redacción del artículo
         print("✍️ Paso 4: Writer iniciando redacción...")
         writer = create_writer_agent()
-        writing_task = create_writing_task(critique_text, solicitud_noticia)
+        writing_task = create_writing_task(informe_actual, solicitud_noticia)
         writing_crew = Crew(
             agents=[writer],
             tasks=[writing_task],

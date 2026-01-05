@@ -309,6 +309,7 @@ def create_final_review_task(articulo: str, solicitud_noticia: str, plan_context
                 <p>Primer párrafo del cuerpo del artículo...</p>
                 <p>Segundo párrafo con información relevante...</p>
                 <p>Continúa desarrollando el contenido de manera estructurada...</p>
+                ... (continúa con el contenido del artículo)
             </section>
             
             <footer>
