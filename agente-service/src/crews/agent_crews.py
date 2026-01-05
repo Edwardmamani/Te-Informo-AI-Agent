@@ -1,6 +1,5 @@
 from crewai import Crew
-from src.tasks.query_tasks import create_query_task, create_suggestions_task
-from src.agents.investigador_agent import create_investigador_agent
+
 from src.tasks.news_tasks import (
     create_planning_task,
     create_investigation_task,

@@ -8,7 +8,6 @@ import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from src.config.settings import SERVER_CONFIG
-from src.utils.env_loader import get_openai_api_key
 from src.routers.agent_routes import agent_bp
 
 app = Flask(__name__)

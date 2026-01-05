@@ -7,6 +7,10 @@
 @baseUrl = http://localhost:5000
 @contentType = application/json
 
+GET {{baseUrl}}/agent/health
+Content-Type: {{contentType}}
+
+
 ### ============================================
 # 1. GENERATE NEWS - Generación básica de noticia
 # Probar el endpoint de generación de noticias con solicitud básica
