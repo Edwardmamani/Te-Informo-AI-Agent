@@ -37,18 +37,26 @@ def create_planning_task(solicitud_noticia: str):
         expected_output="Un plan jerárquico estructurado con el objetivo global, subtareas y criterios de investigación"
     )
 
-def create_investigation_task(solicitud_noticia: str, plan_context: str = ""):
+def create_investigation_task(solicitud_noticia: str, plan_context: str = "", informacion_pre_buscada: str = ""):
     """
     Crea una tarea para que el Watchdog investigue y recopile información
     
     Args:
         solicitud_noticia: La solicitud de noticia original
         plan_context: El contexto del plan generado por el Manager
+        informacion_pre_buscada: Información obtenida del endpoint del backend como texto
         
     Returns:
         Task: Una tarea configurada para investigación
     """
     watchdog = create_watchdog_agent()
+    
+    informacion_contexto = f"""
+        
+        INFORMACIÓN RECOPILADA DEL BACKEND:
+        {informacion_pre_buscada}
+        
+        """ if informacion_pre_buscada else ""
     
     return Task(
         description=f"""
@@ -56,17 +64,17 @@ def create_investigation_task(solicitud_noticia: str, plan_context: str = ""):
         {solicitud_noticia}
         
         {f"Contexto del plan: {plan_context}" if plan_context else ""}
+        {informacion_contexto}
         
         Realiza las siguientes acciones:
-        1. Activa sensores y herramientas de búsqueda para recopilar información
-        2. Busca información de múltiples fuentes confiables y diversas
-        3. Recopila información cruda sobre el tema
-        4. Filtra la información por relevancia según los criterios establecidos
-        5. Organiza la información en un informe preliminar estructurado
+        1. Analiza la información recopilada del backend que se te ha proporcionado
+        2. Identifica los hechos principales y la información más relevante
+        3. Filtra la información por relevancia según los criterios establecidos en el plan
+        4. Organiza la información en un informe preliminar estructurado
         
         Tu informe preliminar debe incluir:
-        - Hechos principales verificados
-        - Fuentes utilizadas
+        - Hechos principales verificados basados en la información proporcionada
+        - Fuentes utilizadas (extraídas de la información del backend)
         - Contexto relevante
         - Información adicional importante
         - Nota sobre la calidad y confiabilidad de las fuentes
@@ -120,46 +128,55 @@ def create_critique_task(informe_preliminar: str, solicitud_noticia: str):
         expected_output="Un análisis crítico con código CODE01 (problemas detectados) o CODE02 (aprobado), incluyendo detalles del análisis"
     )
 
-def create_reinvestigation_task(solicitud_noticia: str, reporte_error: str, plan_context: str = ""):
+def create_reinvestigation_task(solicitud_noticia: str, reporte_error: str, plan_context: str = "", informacion_pre_buscada: str = ""):
     """
-    Crea una tarea para que el Watchdog replanifique y busque fuentes alternativas
+    Crea una tarea para que el Watchdog replanifique y analice información adicional
     
     Args:
         solicitud_noticia: La solicitud de noticia original
         reporte_error: El reporte de errores del Critic
         plan_context: El contexto del plan original
+        informacion_pre_buscada: Información adicional obtenida del endpoint del backend como texto
         
     Returns:
         Task: Una tarea configurada para reinvestigación con backtracking
     """
     watchdog = create_watchdog_agent()
     
+    informacion_contexto = f"""
+        
+        INFORMACIÓN ADICIONAL RECOPILADA DEL BACKEND:
+        {informacion_pre_buscada}
+        
+        """ if informacion_pre_buscada else ""
+    
     return Task(
         description=f"""
-        Se detectaron problemas en el informe preliminar. Debes replanificar la búsqueda (backtracking).
+        Se detectaron problemas en el informe preliminar. Debes replanificar el análisis (backtracking).
         
         Solicitud original: {solicitud_noticia}
         {f"Plan original: {plan_context}" if plan_context else ""}
         
         Reporte de errores del Analista de Sesgos:
         {reporte_error}
+        {informacion_contexto}
         
         Realiza las siguientes acciones:
         1. Analiza el reporte de errores detalladamente
-        2. Replanifica la estrategia de búsqueda (backtracking)
-        3. Busca fuentes alternativas y adicionales
-        4. Enfócate en corregir los problemas específicos identificados
-        5. Recopila nueva información que aborde las deficiencias
-        6. Verifica la calidad de las nuevas fuentes antes de incluirlas
+        2. Replanifica la estrategia de análisis (backtracking)
+        3. Analiza la información adicional proporcionada del backend
+        4. Enfócate en corregir los problemas específicos identificados en el reporte
+        5. Identifica nueva información que aborde las deficiencias
+        6. Verifica la calidad de las fuentes antes de incluirlas
         
         Genera un nuevo informe preliminar corregido que:
         - Aborde todos los problemas identificados en el reporte de errores
-        - Incluya fuentes alternativas y adicionales
+        - Incluya información de las fuentes adicionales proporcionadas
         - Demuestre mejor calidad y veracidad
         - Cumpla con los estándares requeridos
         """,
         agent=watchdog,
-        expected_output="Un nuevo informe preliminar corregido que aborde los problemas identificados con fuentes mejoradas"
+        expected_output="Un nuevo informe preliminar corregido que aborde los problemas identificados con información mejorada"
     )
 
 def create_writing_task(hechos_validados: str, solicitud_noticia: str):
@@ -274,8 +291,49 @@ def create_final_review_task(articulo: str, solicitud_noticia: str, plan_context
            - Indica qué ajustes se necesitan
            - Genera versión corregida
         
-        Tu salida debe ser la noticia final aprobada y lista para publicación, o indicar que se requiere revisión adicional.
+        FORMATO DE SALIDA REQUERIDO - HTML:
+        Tu salida DEBE ser ÚNICAMENTE el contenido en formato HTML, envuelto en un tag <article>.
+        
+        - Si el artículo recibido ya está en formato HTML, verifica que esté bien formateado y preserva el formato HTML.
+        - Si el artículo recibido NO está en formato HTML (por ejemplo, está en Markdown o texto plano), convierte el contenido a formato HTML.
+        
+        La estructura HTML debe ser exactamente así:
+        
+        <article>
+            <header>
+                <h1>Título llamativo pero preciso del artículo</h1>
+                <p class="entradilla">Entradilla o introducción atractiva que resuma los puntos clave</p>
+            </header>
+            
+            <section class="cuerpo">
+                <p>Primer párrafo del cuerpo del artículo...</p>
+                <p>Segundo párrafo con información relevante...</p>
+                <p>Continúa desarrollando el contenido de manera estructurada...</p>
+            </section>
+            
+            <footer>
+                <p class="conclusion">Conclusión apropiada que cierre el artículo</p>
+                <div class="fuentes">
+                    <h3>Fuentes:</h3>
+                    <ul>
+                        <li>Fuente 1</li>
+                        <li>Fuente 2</li>
+                    </ul>
+                </div>
+            </footer>
+        </article>
+        
+        IMPORTANTE:
+        - Retorna SOLO el HTML, sin texto adicional antes o después
+        - El tag <article> debe ser el elemento raíz
+        - Usa etiquetas HTML semánticas apropiadas (header, section, footer, h1, p, ul, li)
+        - El HTML debe ser válido y bien formateado
+        - No incluyas explicaciones, comentarios fuera del HTML, o texto adicional
+        - NO incluyas metadatos, revisiones, o comentarios sobre el proceso de revisión en el HTML final
+        - El HTML debe contener SOLO el artículo periodístico, listo para publicar
+        
+        Tu salida debe ser la noticia final en formato HTML, aprobada y lista para publicación.
         """,
         agent=manager,
-        expected_output="La noticia final aprobada y lista para publicación, o indicación de ajustes necesarios"
+        expected_output="La noticia final aprobada en formato HTML (envuelta en tag <article>), lista para publicación, sin texto adicional"
     )

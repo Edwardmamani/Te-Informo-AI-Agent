@@ -1,6 +1,5 @@
 from crewai import Agent
 from src.config.settings import get_llm
-from src.tools.news_api_tool import search_news_tool, extract_content_tool
 
 llm = get_llm()
 
@@ -24,7 +23,6 @@ def create_investigador_agent():
         ),
         llm=llm,
         verbose=True,
-        tools=[search_news_tool, extract_content_tool],  # Herramientas de noticias del backend
         allow_delegation=False
     )
 

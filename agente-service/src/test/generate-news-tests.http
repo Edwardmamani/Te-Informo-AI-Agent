@@ -1,0 +1,112 @@
+###
+# Archivo de pruebas REST Client para el endpoint /generate-news
+# Usa la extensión REST Client de VS Code para ejecutar estas peticiones
+# Base URL: http://localhost:5000
+###
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### ============================================
+# 1. GENERATE NEWS - Generación básica de noticia
+# Probar el endpoint de generación de noticias con solicitud básica
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Escribe una noticia sobre los avances en inteligencia artificial en 2024"
+}
+
+### ============================================
+# 2. GENERATE NEWS - Con todos los parámetros
+# Probar con solicitud, max_iterations y quality_threshold
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Genera una noticia sobre las tendencias tecnológicas en desarrollo de software",
+  "max_iterations": 2,
+  "quality_threshold": 0.25
+}
+
+### ============================================
+# 3. GENERATE NEWS - Tema específico
+# Probar con un tema más específico y detallado
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Crea una noticia sobre el impacto de los agentes de IA multi-agente en la industria de la información"
+}
+
+### ============================================
+# 4. GENERATE NEWS - Con configuración personalizada
+# Probar con valores personalizados de iteraciones y umbral
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Escribe una noticia sobre CrewAI y sus aplicaciones en sistemas multi-agente",
+  "max_iterations": 2,
+  "quality_threshold": 0.75
+}
+
+### ============================================
+# 5. GENERATE NEWS - Error: solicitud vacía
+# Probar validación cuando solicitud está vacía
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": ""
+}
+
+### ============================================
+# 6. GENERATE NEWS - Error: sin campo solicitud
+# Probar validación cuando falta el campo obligatorio
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "max_iterations": 3,
+  "quality_threshold": 0.8
+}
+
+### ============================================
+# 7. GENERATE NEWS - Solo con solicitud (valores por defecto)
+# Probar que funciona solo con el campo obligatorio
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Genera una noticia sobre el futuro de la automatización con IA"
+}
+
+### ============================================
+# 8. GENERATE NEWS - Tema de actualidad
+# Probar con un tema de noticias actuales
+### ============================================
+
+POST {{baseUrl}}/agent/generate-news
+Content-Type: {{contentType}}
+
+{
+  "solicitud": "Escribe una noticia sobre las mejores prácticas para desarrollar sistemas multi-agente escalables",
+  "max_iterations": 4,
+  "quality_threshold": 0.9
+}
+

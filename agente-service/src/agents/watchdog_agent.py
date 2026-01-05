@@ -8,28 +8,26 @@ def create_watchdog_agent():
     Crea y retorna un agente Watchdog (Investigador) configurado
     
     El Watchdog es responsable de:
-    - Activar sensores (herramientas de búsqueda)
-    - Recopilar información cruda
-    - Filtrar por relevancia
+    - Analizar información pre-buscada del backend
+    - Filtrar información por relevancia
     - Entregar informe preliminar
-    - Replanificar búsqueda si se detectan problemas (backtracking)
-    - Buscar fuentes alternativas cuando es necesario
+    - Replanificar análisis si se detectan problemas (backtracking)
     
     Returns:
         Agent: Un agente Watchdog configurado con el LLM
     """
     return Agent(
         role='Investigador (Watchdog)',
-        goal='Investigar, recopilar y filtrar información relevante para la noticia solicitada',
+        goal='Analizar y filtrar información relevante para la noticia solicitada',
         backstory=(
-            'Eres un investigador periodístico experto con acceso a múltiples fuentes y herramientas de búsqueda. '
-            'Tu función es activar sensores de búsqueda, recopilar información cruda de diversas fuentes, '
-            'filtrarla por relevancia y presentar un informe preliminar. Cuando se detectan problemas de calidad, '
-            'sesgos o datos falsos, debes replanificar la búsqueda (backtracking) y buscar fuentes alternativas '
-            'hasta alcanzar el umbral de calidad requerido. Tienes una gran capacidad de análisis y una red '
-            'extensa de fuentes confiables.'
+            'Eres un investigador periodístico experto con gran capacidad de análisis. '
+            'Tu función es analizar información proporcionada del backend, filtrarla por relevancia '
+            'y presentar un informe preliminar estructurado. Cuando se detectan problemas de calidad, '
+            'sesgos o datos falsos, debes replanificar el análisis y solicitar información adicional '
+            'hasta alcanzar el umbral de calidad requerido. Tienes una gran capacidad de análisis y '
+            'experiencia en evaluación de fuentes periodísticas.'
         ),
         llm=llm,
         verbose=True,
-        tools=[]  # Aquí se pueden agregar herramientas de búsqueda específicas
+        allow_delegation=False
     )

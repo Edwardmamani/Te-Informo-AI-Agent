@@ -1,0 +1,33 @@
+INICIO
+Jefe de Redaccion (Manager)
+- Recibir Solicitur de Noticia
+- Analizar Objetivo Global
+- Descomponer en Plan Jerárquico (HTN) Planificacion de Orden Parcial
+- Delegar Tarea de Busqueda
+Investigador (Watchdog)
+- Activa Sensores (Herramietas de Busqueda)
+- Recopila Informacion Cruda
+- Filtrar por relevancia
+- Entregar Informe Preliminar
+Analista de Sesgos (Critic)
+- Leer informe del investigador
+- Ejecutar Vigilancia de Ejecucion
+- ¿Detecta Sesgo, Falacia o Datos Falso?
+SI: (CODE01)
+	-- Generar Resporte de Error
+	-- Solicitar Correccion/ Mas fuentes
+	-- El (watchdog) Replanificar Busqueda (Backtracking)
+	-- El (Watchdog) Buscar Fuentes Alternativas
+	-- calidad < Umbal ? SI: Entra a CODE01 NO	: CODE03
+NO: (CODE02)
+	-- Aprobar hechos
+	-- CODE03
+NO: (CODE03)
+- Pasar Datos Limpios al Redator
+Redactor (writer)
+- Recibir Hechos Validados
+- Redactar Articulo (Accion Primitiva)
+- Formatear Salida
+- El (Manager) Revision FInal (Supervisor)
+- Publicar Noticia
+- FIN

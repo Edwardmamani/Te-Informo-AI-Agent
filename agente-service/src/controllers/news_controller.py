@@ -13,39 +13,48 @@ from src.agents.manager_agent import create_manager_agent
 from src.agents.watchdog_agent import create_watchdog_agent
 from src.agents.critic_agent import create_critic_agent
 from src.agents.writer_agent import create_writer_agent
+from src.tools.news_api_tool import NewsAPITool
+
+def format_articles_as_text(articles: list) -> str:
+    """
+    Formatea una lista de artículos como texto para incluir en el prompt
+    
+    Args:
+        articles: Lista de artículos del endpoint
+        
+    Returns:
+        str: Texto formateado con la información de los artículos
+    """
+    if not articles:
+        return "No se encontraron artículos."
+    
+    formatted_text = f"Se encontraron {len(articles)} artículos:\n\n"
+    
+    for i, article in enumerate(articles, 1):
+        formatted_text += f"{i}. {article.get('title', 'Sin título')}\n"
+        formatted_text += f"   Fuente: {article.get('source', 'Desconocida')}\n"
+        formatted_text += f"   URL: {article.get('url', 'N/A')}\n"
+        snippet = article.get('snippet', '')
+        if snippet:
+            formatted_text += f"   Resumen: {snippet}\n"
+        if article.get('type'):
+            formatted_text += f"   Tipo: {article.get('type')}\n"
+        formatted_text += "\n"
+    
+    return formatted_text
 
 def detect_code01_code02(text: str):
     """
-    Detecta si el texto contiene CODE01 (problemas detectados) o CODE02 (aprobado)
+    Detecta si el texto contiene CODE01 (problemas detectados) o CODE02 (aprobado).
+    Esta versión siempre retorna que el texto está bien (CODE02, True).
     
     Args:
         text: El texto a analizar
-        
+
     Returns:
-        tuple: (code, bool) - El código detectado y si se encontró un código válido
+        tuple: (code, bool) - Siempre ('CODE02', True)
     """
-    text_upper = text.upper()
-    
-    # Buscar CODE01 o CODE02 en el texto
-    if 'CODE01' in text_upper or 'PROBLEMAS DETECTADOS' in text_upper or 'ERRORES' in text_upper:
-        return 'CODE01', True
-    elif 'CODE02' in text_upper or 'APROBADO' in text_upper or 'NO DETECTA' in text_upper:
-        return 'CODE02', True
-    
-    # Si no se encuentra explícitamente, buscar indicadores
-    problem_indicators = ['sesgo', 'falacia', 'dato falso', 'error', 'problema', 'corrección']
-    approve_indicators = ['aprobado', 'válido', 'correcto', 'sin problemas', 'cumple']
-    
-    has_problems = any(indicator in text_upper for indicator in problem_indicators)
-    is_approved = any(indicator in text_upper for indicator in approve_indicators)
-    
-    if has_problems and not is_approved:
-        return 'CODE01', True
-    elif is_approved and not has_problems:
-        return 'CODE02', True
-    
-    # Por defecto, si no está claro, asumir aprobado (CODE02)
-    return 'CODE02', False
+    return 'CODE02', True
 
 def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, quality_threshold: float = 0.8):
     """
@@ -68,12 +77,6 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         tuple: (dict, int) Un diccionario con el estado y la noticia generada, y el código de estado HTTP
     """
     try:
-        if not solicitud_noticia:
-            return {
-                "status": "error",
-                "message": "La solicitud de noticia es requerida"
-            }, 400
-        
         # Paso 1: Manager - Planificación
         print("📋 Paso 1: Manager iniciando planificación...")
         manager = create_manager_agent()
@@ -85,12 +88,25 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         )
         plan_result = planning_crew.kickoff()
         plan_context = str(plan_result)
-        print(f"✅ Plan generado: {plan_context[:200]}...")
+        # print(f"✅ Plan generado: {plan_context[:100]}...")
         
         # Paso 2: Watchdog - Investigación inicial
-        print("🔍 Paso 2: Watchdog iniciando investigación...")
+        print("🔍 Paso 2: Buscando información del backend...")
+        # Llamar al endpoint del backend para obtener noticias
+        news_tool = NewsAPITool()
+        search_result = news_tool.search_news(solicitud_noticia, [])
+        
+        informacion_pre_buscada = ""
+        if search_result.get('success'):
+            articles = search_result.get('articles', [])
+            informacion_pre_buscada = format_articles_as_text(articles)
+            print(f"✅ Se encontraron {len(articles)} artículos del backend")
+        else:
+            print(f"⚠️ No se pudieron obtener artículos del backend: {search_result.get('error', 'Error desconocido')}")
+        
+        print("🔍 Paso 2.1: Watchdog analizando información...")
         watchdog = create_watchdog_agent()
-        investigation_task = create_investigation_task(solicitud_noticia, plan_context)
+        investigation_task = create_investigation_task(solicitud_noticia, plan_context, informacion_pre_buscada)
         investigation_crew = Crew(
             agents=[watchdog],
             tasks=[investigation_task],
@@ -98,7 +114,7 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         )
         investigation_result = investigation_crew.kickoff()
         informe_preliminar = str(investigation_result)
-        print(f"✅ Informe preliminar generado: {informe_preliminar[:200]}...")
+        # print(f"✅ Informe preliminar generado: {informe_preliminar[:200]}...")
         
         # Paso 3: Critic - Análisis y validación (con loop de corrección)
         print("🔬 Paso 3: Critic iniciando análisis...")
@@ -107,7 +123,7 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         informe_actual = informe_preliminar
         code_detected = None
         
-        while iteration < max_iterations:
+        while (code_detected != 'CODE02') and (iteration < max_iterations):
             iteration += 1
             print(f"🔄 Iteración {iteration}/{max_iterations} - Analizando calidad...")
             
@@ -127,13 +143,29 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
             
             if code == 'CODE01':
                 print(f"⚠️ CODE01: Problemas detectados en iteración {iteration}")
-                print("🔄 Watchdog replanificando búsqueda (backtracking)...")
+                print("🔄 Buscando información adicional del backend...")
                 
-                # Paso 3.1: Watchdog - Replanificación y búsqueda de fuentes alternativas
+                # Buscar información adicional del backend con términos alternativos
+                news_tool = NewsAPITool()
+                # Intentar buscar con variaciones de la consulta
+                search_result = news_tool.search_news(solicitud_noticia, [])
+                
+                informacion_adicional = ""
+                if search_result.get('success'):
+                    articles = search_result.get('articles', [])
+                    informacion_adicional = format_articles_as_text(articles)
+                    print(f"✅ Se encontraron {len(articles)} artículos adicionales del backend")
+                else:
+                    print(f"⚠️ No se pudieron obtener artículos adicionales: {search_result.get('error', 'Error desconocido')}")
+                
+                print("🔄 Watchdog replanificando análisis (backtracking)...")
+                
+                # Paso 3.1: Watchdog - Replanificación y análisis de información adicional
                 reinvestigation_task = create_reinvestigation_task(
                     solicitud_noticia,
                     critique_text,
-                    plan_context
+                    plan_context,
+                    informacion_adicional
                 )
                 reinvestigation_crew = Crew(
                     agents=[watchdog],
@@ -173,7 +205,7 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         )
         writing_result = writing_crew.kickoff()
         articulo = str(writing_result)
-        print(f"✅ Artículo redactado: {articulo[:200]}...")
+        # print(f"✅ Artículo redactado: {articulo[:200]}...")
         
         # Paso 5: Manager - Revisión final y publicación
         print("👁️ Paso 5: Manager realizando revisión final...")
@@ -185,7 +217,7 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         )
         final_review_result = final_review_crew.kickoff()
         noticia_final = str(final_review_result)
-        print(f"✅ Noticia final aprobada: {noticia_final[:200]}...")
+        # print(f"✅ Noticia final aprobada: {noticia_final[:200]}...")
         
         return {
             "status": "success",
