@@ -14,7 +14,11 @@ from src.agents.watchdog_agent import create_watchdog_agent
 from src.agents.critic_agent import create_critic_agent
 from src.agents.writer_agent import create_writer_agent
 from src.tools.news_api_tool import NewsAPITool
-interador = 1
+from src.tools.tools import NewsSearchTool
+from src.tools.tools import NewsSearchTool
+
+
+interador = 0
 
 def format_articles_as_text(articles: list) -> str:
     """
@@ -96,16 +100,14 @@ def handle_news_generation(solicitud_noticia: str, max_iterations: int = 3, qual
         # Paso 2: Watchdog - Investigación inicial
         print("🔍 Paso 2: Buscando información del backend...")
         # Llamar al endpoint del backend para obtener noticias
-        news_tool = NewsAPITool()
-        search_result = news_tool.search_news(solicitud_noticia, [])
-        
-        informacion_pre_buscada = ""
-        if search_result.get('success'):
-            articles = search_result.get('articles', [])
-            informacion_pre_buscada = format_articles_as_text(articles)
-            print(f"✅ Se encontraron {len(articles)} artículos del backend")
-        else:
-            print(f"⚠️ No se pudieron obtener artículos del backend: {search_result.get('error', 'Error desconocido')}")
+
+        tool = NewsSearchTool()
+        result = tool._run(
+            query=solicitud_noticia,
+            max_results=3
+        )
+
+        informacion_pre_buscada = result
         
         print("🔍 Paso 2.1: Watchdog analizando información...")
         watchdog = create_watchdog_agent()

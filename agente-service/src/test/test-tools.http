@@ -1,0 +1,8 @@
+### Prueba directa a ScraperRalf para búsqueda de noticias (¡Nota: este endpoint puede tardar hasta 3 minutos en responder!)
+GET https://scraper.rendoaltar.dev/search?q=inteligencia+artificial+medicina
+
+### Prueba con otro término de búsqueda
+GET https://scraper.rendoaltar.dev/search?q=clima+Perú
+
+### Prueba de límite de resultados (si soporta el parámetro adicional)
+GET https://scraper.rendoaltar.dev/search?q=economía&max_results=3
