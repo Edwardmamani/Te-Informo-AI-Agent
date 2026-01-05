@@ -4,6 +4,7 @@
 
 // Configuración
 const API_URL = 'http://localhost:3001/api';
+const AGENT_API_URL = 'http://localhost:5000';
 
 // Estado
 let conversationContext = [];
@@ -33,6 +34,10 @@ const feedbackSection = document.getElementById('feedbackSection');
 const aiSummary = document.getElementById('aiSummary');
 const keyPoints = document.getElementById('keyPoints');
 const statusText = document.querySelector('.status-text');
+const generatedNewsSection = document.getElementById('generatedNewsSection');
+const generatedNewsContent = document.getElementById('generatedNewsContent');
+const closeGeneratedNewsBtn = document.getElementById('closeGeneratedNewsBtn');
+const generateNewsInput = document.getElementById('generateNewsInput');
 
 // Elementos de intereses
 const addInterestBtn = document.getElementById('addInterestBtn');
@@ -57,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', handleReset);
     toggleSidebarBtn.addEventListener('click', closeSidebar);
     chatTab.addEventListener('click', openSidebar);
+    closeGeneratedNewsBtn.addEventListener('click', closeGeneratedNews);
     
     // Event Listeners de Intereses
     addInterestBtn.addEventListener('click', showAddInterestForm);
@@ -188,6 +194,22 @@ async function handleSendMessage() {
     messageInput.value = '';
     addUserMessage(query);
     welcomeScreen.classList.add('hidden');
+    
+    // Detectar si el usuario quiere generar una noticia
+    const generateKeywords = ['genera', 'crea', 'escribe', 'redacta', 'haz', 'hacer'];
+    const shouldGenerate = generateKeywords.some(keyword => 
+        query.toLowerCase().includes(keyword) && 
+        (query.toLowerCase().includes('noticia') || query.toLowerCase().includes('artículo'))
+    );
+    
+    if (shouldGenerate) {
+        await handleGenerateNews(query);
+    } else {
+        await handleSearchNews(query);
+    }
+}
+
+async function handleSearchNews(query) {
     showLoading();
     
     try {
@@ -235,6 +257,48 @@ async function handleSendMessage() {
         }
     } catch (error) {
         console.error('Error:', error);
+        addAgentMessage(`❌ Error: ${error.message}`);
+        showError(error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+async function handleGenerateNews(solicitud) {
+    showLoading();
+    addAgentMessage(`✨ Generando noticia sobre "${solicitud}"...`);
+    
+    try {
+        const response = await fetch(`${AGENT_API_URL}/agent/generate-news`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                solicitud: solicitud,
+                max_iterations: 2,
+                quality_threshold: 0.25
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Mostrar la noticia generada
+            displayGeneratedNews(data.noticia);
+            addAgentMessage(`✅ Noticia generada exitosamente!`);
+            
+            // Actualizar contexto
+            conversationContext.push(solicitud);
+        } else {
+            throw new Error(data.message || 'Error generando la noticia');
+        }
+    } catch (error) {
+        console.error('Error generando noticia:', error);
         addAgentMessage(`❌ Error: ${error.message}`);
         showError(error.message);
     } finally {
@@ -482,6 +546,30 @@ window.quickSearch = function(topic) {
     sendBtn.click();
 };
 
+window.generateNewsFromInput = function() {
+    const query = generateNewsInput.value.trim();
+    if (!query) {
+        alert('Por favor, escribe un tema para la noticia');
+        generateNewsInput.focus();
+        return;
+    }
+    
+    // Usar el input del chat para mantener consistencia
+    messageInput.value = `Genera una noticia sobre ${query}`;
+    generateNewsInput.value = ''; // Limpiar el input
+    sendBtn.click();
+};
+
+// Permitir Enter en el input de generación de noticias
+if (generateNewsInput) {
+    generateNewsInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            generateNewsFromInput();
+        }
+    });
+}
+
 window.removeInterest = removeInterest;
 
 // ==================== Sistema de Calificación ====================
@@ -547,3 +635,32 @@ async function rateFeedback(rating) {
 }
 
 window.rateFeedback = rateFeedback;
+
+// ==================== Noticia Generada ====================
+
+function displayGeneratedNews(noticiaHtml) {
+    if (!noticiaHtml) return;
+    
+    // Insertar el HTML de la noticia directamente
+    generatedNewsContent.innerHTML = noticiaHtml;
+    
+    // Mostrar la sección
+    generatedNewsSection.classList.remove('hidden');
+    
+    // Ocultar otras secciones
+    analysisSection.classList.add('hidden');
+    articlesSection.classList.add('hidden');
+    videosSection.classList.add('hidden');
+    
+    // Scroll a la noticia
+    setTimeout(() => {
+        generatedNewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+}
+
+function closeGeneratedNews() {
+    generatedNewsSection.classList.add('hidden');
+    generatedNewsContent.innerHTML = '';
+}
+
+window.closeGeneratedNews = closeGeneratedNews;

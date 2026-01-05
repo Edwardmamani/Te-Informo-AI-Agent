@@ -121,6 +121,19 @@
                         <button class="topic-btn" onclick="quickSearch('Ciencia')">Ciencia</button>
                         <button class="topic-btn" onclick="quickSearch('Deportes')">Deportes</button>
                     </div>
+                    <div class="generate-news-section">
+                        <p class="quick-topics-title">O genera una noticia personalizada:</p>
+                        <div class="generate-news-form">
+                            <input 
+                                type="text" 
+                                id="generateNewsInput" 
+                                class="generate-news-input" 
+                                placeholder="Ej: Tendencias tecnológicas en desarrollo de software"
+                                autocomplete="off"
+                            >
+                            <button class="generate-news-btn" onclick="generateNewsFromInput()">✨ Generar Noticia</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- AI Analysis Section -->
@@ -165,6 +178,16 @@
                     <div id="videosGrid" class="news-grid"></div>
                 </div>
 
+                <!-- Generated News Section -->
+                <div id="generatedNewsSection" class="generated-news-section hidden">
+                    <div class="generated-news-card glass-card">
+                        <div class="generated-news-header">
+                            <h3 class="section-title">✨ Noticia Generada por IA</h3>
+                            <button id="closeGeneratedNewsBtn" class="close-btn" title="Cerrar">×</button>
+                        </div>
+                        <div id="generatedNewsContent" class="generated-news-content"></div>
+                    </div>
+                </div>
 
                 <!-- Loading -->
                 <div id="loadingIndicator" class="loading-indicator hidden">
