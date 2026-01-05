@@ -5,13 +5,25 @@ Estructura refactorizada con separación de responsabilidades
 """
 
 import os
-from flask import Flask, jsonify
+import json
+from flask import Flask, Response
 from flask_cors import CORS
 from src.config.settings import SERVER_CONFIG
 from src.routers.agent_routes import agent_bp
 
 app = Flask(__name__)
 CORS(app)  # Permitir CORS para conectar con el frontend
+
+# Configurar Flask para usar UTF-8 y no escapar caracteres Unicode
+app.config['JSON_AS_ASCII'] = False
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+
+# Configurar el encoder JSON personalizado para asegurar UTF-8
+class UTF8JSONEncoder(json.JSONEncoder):
+    def encode(self, o):
+        return super().encode(o)
+
+app.json_encoder = UTF8JSONEncoder
 
 # Registrar los blueprints (rutas)
 app.register_blueprint(agent_bp)
@@ -20,7 +32,11 @@ app.register_blueprint(agent_bp)
 @app.route('/', methods=['GET'])
 def root():
     """Endpoint raíz"""
-    return jsonify({"status": "ok", "message": "Servidor de agente IA funcionando"})
+    response = {"status": "ok", "message": "Servidor de agente IA funcionando"}
+    return Response(
+        json.dumps(response, ensure_ascii=False),
+        mimetype='application/json; charset=utf-8'
+    )
 
 if __name__ == '__main__':
     # Verificar que la API key esté configurada

@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request
+import json
+from flask import Blueprint, request, Response
 from src.controllers.news_controller import handle_news_generation
 
 # Crear un blueprint para las rutas del agente
@@ -7,10 +8,14 @@ agent_bp = Blueprint('agent', __name__, url_prefix='/agent')
 @agent_bp.route('/health', methods=['GET'])
 def health():
     """Endpoint de salud"""
-    return jsonify({
+    response = {
         "status": "ok",
         "message": "Servidor de agente IA funcionando"
-    })
+    }
+    return Response(
+        json.dumps(response, ensure_ascii=False),
+        mimetype='application/json; charset=utf-8'
+    )
 
 
 @agent_bp.route('/generate-news', methods=['POST'])
@@ -29,10 +34,14 @@ def generate_news():
     quality_threshold = data.get('quality_threshold')
 
     if solicitud is None or str(solicitud).strip() == "":
-        return jsonify({
+        error_response = {
             "error": "No se proporcionó solicitud para generación de noticia.",
             "detail": "El campo 'solicitud' es obligatorio y no debe estar vacío."
-        }), 400
+        }
+        return Response(
+            json.dumps(error_response, ensure_ascii=False),
+            mimetype='application/json; charset=utf-8'
+        ), 400
 
     # Valores por defecto si no fueron provistos
     if max_iterations is None:
@@ -41,5 +50,9 @@ def generate_news():
         quality_threshold = 0.8
     
     response, status_code = handle_news_generation(solicitud, max_iterations, quality_threshold)
-    return jsonify(response), status_code
+    # Usar json.dumps con ensure_ascii=False para preservar caracteres UTF-8
+    return Response(
+        json.dumps(response, ensure_ascii=False),
+        mimetype='application/json; charset=utf-8'
+    ), status_code
 
